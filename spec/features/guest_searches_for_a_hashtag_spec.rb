@@ -9,6 +9,19 @@ feature 'Guest searches for a hashtag' do
     expect(page).to have_css 'li', text: /#rails/i, count: 15
   end
 
+  scenario 'display known information' do
+    Searcher.backend = FakeTwitter
+    FakeTwitter['#rails'] = 5.times.map do
+      {text: "I love #rails" }
+    end
+
+    visit root_path
+    search_for("#rails")
+
+    expect(current_path).to eq '/searches/rails'
+    expect(page).to have_css 'li', text: "I love #rails", count: 5
+  end
+
   scenario 'searches without a hashtag' do
     visit root_path
     search_for("rails")
@@ -29,4 +42,5 @@ feature 'Guest searches for a hashtag' do
     fill_in 'Search', with: term
     click_on 'Submit'
   end
+
 end
